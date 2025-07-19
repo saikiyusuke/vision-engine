@@ -1,0 +1,26 @@
+{
+  "name": "autoclaude-vision",
+  "version": "1.0.0",
+  "description": "AI Vision-powered web automation",
+  "main": "autoclaude-vision.js",
+  "scripts": {
+    "test": "node test-vision.js",
+    "airregi": "node airregi-vision.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "dotenv": "^17.2.0",
+    "ftp": "^0.3.10",
+    "nodemailer": "^7.0.5",
+    "playwright": "^1.40.0"
+  },
+  "keywords": [
+    "automation",
+    "ai",
+    "vision",
+    "claude",
+    "playwright"
+  ],
+  "author": "",
+  "license": "MIT"
+}
