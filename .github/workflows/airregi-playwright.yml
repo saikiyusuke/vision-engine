@@ -1,0 +1,85 @@
+name: Airレジ自動同期（Playwright直接版）
+
+on:
+  # 手動実行
+  workflow_dispatch:
+  
+  # 定期実行（日本時間10:00-23:00の毎時30分）
+  schedule:
+    # AutoClaude版と時間をずらして実行
+    - cron: '30 1-14 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    # タイムアウト設定
+    timeout-minutes: 15
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: 📥 リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      # Node.jsのセットアップ
+      - name: 🔧 Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 依存関係のインストール
+      - name: 📦 依存関係をインストール
+        run: npm ci
+
+      # Playwrightのブラウザをインストール
+      - name: 🌐 Playwright ブラウザをインストール
+        run: |
+          npx playwright install chromium
+          npx playwright install-deps chromium
+
+      # PHPのセットアップ（メール送信用）
+      - name: 🐘 PHP セットアップ
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, curl
+
+      # Airレジ自動同期を実行（Playwright直接版）
+      - name: 🚀 Airレジ自動同期を実行
+        env:
+          AIRREGI_USERNAME: ${{ secrets.AIRREGI_USERNAME }}
+          AIRREGI_PASSWORD: ${{ secrets.AIRREGI_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          CI: true
+        run: node airregi-playwright-direct.js
+
+      # エラー時のデバッグ用アーティファクト
+      - name: 📸 デバッグ用スクリーンショットを保存
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots-playwright
+          path: |
+            *.png
+            downloads/*.csv
+          retention-days: 7
+
+      # 成功時のアーティファクト（CSVファイル）
+      - name: 💾 ダウンロードしたCSVを保存
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: airregi-csv-playwright-${{ github.run_id }}
+          path: downloads/*.csv
+          retention-days: 30
+
+      # 実行結果の通知
+      - name: 📧 実行結果を通知
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Airレジ自動同期（Playwright版）が正常に完了しました"
+          else
+            echo "❌ Airレジ自動同期（Playwright版）でエラーが発生しました"
+          fi
