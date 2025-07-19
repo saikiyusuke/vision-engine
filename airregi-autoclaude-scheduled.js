@@ -60,7 +60,7 @@ async function main() {
     
     // ログインページへアクセス
     await autoVision.goto('https://airregi.jp/CLP/view/salesListByMenu/');
-    await autoVision.page.waitForTimeout(3000);
+    await autoVision.page.waitForTimeout(5000);
 
     // スクリーンショット（デバッグ用）
     if (isCI) {
@@ -72,16 +72,25 @@ async function main() {
       await autoVision.waitFor('ユーザー名の入力欄', 5000);
       log('ログインが必要です');
 
-      // ユーザー名入力
-      await autoVision.fill('ユーザー名またはメールアドレスの入力欄', CONFIG.airregi.username);
+      // ユーザー名入力（AirIDまたはメールアドレス）
+      try {
+        await autoVision.fill('AirIDまたはメールアドレス入力欄', CONFIG.airregi.username);
+      } catch (e) {
+        await autoVision.fill('ユーザー名またはメールアドレスの入力欄', CONFIG.airregi.username);
+      }
       await autoVision.page.waitForTimeout(1000);
 
       // パスワード入力
       await autoVision.fill('パスワードの入力欄', CONFIG.airregi.password);
       await autoVision.page.waitForTimeout(1000);
 
-      // ログインボタンクリック
-      await autoVision.click('ログインボタン');
+      // ログインボタンクリック（Airレジの青いボタン）
+      try {
+        await autoVision.click('青色のログインボタン');
+      } catch (e) {
+        // 別の方法：Enterキーで送信
+        await autoVision.page.keyboard.press('Enter');
+      }
       await autoVision.page.waitForTimeout(5000);
 
       log('ログイン完了', 'success');
@@ -121,7 +130,17 @@ async function main() {
     const downloadPromise = autoVision.page.waitForEvent('download');
 
     // CSVダウンロードボタンをクリック（自然言語で）
-    await autoVision.click('CSVダウンロードボタンまたはダウンロードリンク');
+    try {
+      await autoVision.click('CSVダウンロードボタン');
+    } catch (e) {
+      // 別の表現を試す
+      try {
+        await autoVision.click('ダウンロード');
+      } catch (e2) {
+        // さらに別の表現
+        await autoVision.click('CSV形式でダウンロード');
+      }
+    }
 
     // ダウンロード完了を待つ
     const download = await downloadPromise;
