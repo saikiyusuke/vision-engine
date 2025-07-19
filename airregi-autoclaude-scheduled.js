@@ -88,10 +88,18 @@ async function main() {
       try {
         await autoVision.click('青色のログインボタン');
       } catch (e) {
-        // 別の方法：Enterキーで送信
+        log('ログインボタンが見つからないため、Enterキーで送信します');
+        // パスワードフィールドにフォーカスがある状態でEnterキーを押す
         await autoVision.page.keyboard.press('Enter');
       }
-      await autoVision.page.waitForTimeout(5000);
+      
+      // ログイン後のページ遷移を待つ
+      try {
+        await autoVision.page.waitForNavigation({ waitUntil: 'networkidle', timeout: 10000 });
+      } catch (e) {
+        // ナビゲーションを待たずに続行
+        await autoVision.page.waitForTimeout(5000);
+      }
 
       log('ログイン完了', 'success');
     } catch (e) {
