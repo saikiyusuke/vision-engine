@@ -5,7 +5,7 @@
  */
 
 require('dotenv').config();
-const AutoClaudeVision = require('./autoclaude-vision');
+const EnhancedAutoClaude = require('./enhanced-autoclaude-vision');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
@@ -43,7 +43,7 @@ async function main() {
     process.exit(1);
   }
 
-  const autoVision = new AutoClaudeVision(CONFIG.anthropic.apiKey);
+  const autoVision = new EnhancedAutoClaude(CONFIG.anthropic.apiKey);
   let downloadPath = null;
   let uploadSuccess = false;
 
