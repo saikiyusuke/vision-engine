@@ -10,3 +10,13 @@ logs/
 temp/
 debug-*.png
 error-*.png
+
+# Recordings
+recordings/
+*.webm
+*.mp4
+
+# Generated playback scripts
+airregi-playback.js
+airregi-codegen.js
+airregi-recorded-actions.json

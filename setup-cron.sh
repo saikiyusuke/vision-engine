@@ -1,58 +1,35 @@
 #\!/bin/bash
 # Airレジ自動化のcron設定スクリプト
 
-echo "📍 Airレジ自動化のcron設定を開始します..."
-
-# 現在のcrontabを一時ファイルに保存
-TEMP_CRON="/tmp/current_cron_$$"
-crontab -l > "$TEMP_CRON" 2>/dev/null || true
-
-# 新しいcronジョブの定義
-CRON_JOB="0 10-23 * * * /bin/bash /Users/apple/Projects/mothership/vision-engine/airregi-local-cron.sh >> /Users/apple/Projects/mothership/vision-engine/logs/airregi-cron.log 2>&1"
-
-# 既に同じジョブが存在するか確認
-if grep -F "airregi-local-cron.sh" "$TEMP_CRON" > /dev/null 2>&1; then
-    echo "⚠️  既にAirレジ自動化のcronジョブが存在します"
-    echo "既存のエントリ:"
-    grep "airregi-local-cron.sh" "$TEMP_CRON"
-    echo ""
-    read -p "既存のエントリを置き換えますか？ (y/n): " -n 1 -r
-    echo ""
-    
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # 既存のエントリを削除
-        grep -v "airregi-local-cron.sh" "$TEMP_CRON" > "${TEMP_CRON}.new"
-        mv "${TEMP_CRON}.new" "$TEMP_CRON"
-    else
-        echo "❌ 設定をキャンセルしました"
-        rm "$TEMP_CRON"
-        exit 0
-    fi
-fi
-
-# 新しいジョブを追加
-echo "$CRON_JOB" >> "$TEMP_CRON"
-
-# crontabを更新
-crontab "$TEMP_CRON"
-
-# 一時ファイルを削除
-rm "$TEMP_CRON"
-
-echo "✅ crontabに追加しました:"
-echo "$CRON_JOB"
+echo "🕐 Airレジ自動化のcron設定"
+echo "========================="
 echo ""
-echo "📋 現在のcrontab:"
-crontab -l | grep "airregi-local-cron.sh"
+echo "以下のcron設定を追加することで、定期的に売上データを取得・通知します："
 echo ""
-echo "🕐 実行スケジュール: 毎日10時〜23時の毎時0分"
-echo "📝 ログファイル: /Users/apple/Projects/mothership/vision-engine/logs/airregi-cron.log"
+echo "1. 毎時0分に実行（営業時間中）"
+echo "   0 10-18 * * * /usr/local/bin/node airregi-full-automation.js > /tmp/airregi-cron.log 2>&1"
 echo ""
-echo "💡 手動でテストする場合:"
-echo "   ./airregi-local-cron.sh"
+echo "2. 特定時刻に詳細レポート（11時、15時、19時）"
+echo "   0 11,15,19 * * * cd /Users/apple/Projects/mothership/vision-engine && /usr/local/bin/node airregi-full-automation.js > /tmp/airregi-cron.log 2>&1"
 echo ""
-echo "💡 crontabを編集する場合:"
+echo "3. 営業終了後の日次サマリー（19時）"
+echo "   0 19 * * * cd /Users/apple/Projects/mothership/vision-engine && /usr/local/bin/node airregi-full-automation.js > /tmp/airregi-cron.log 2>&1"
+echo ""
+echo "設定方法："
+echo "1. ターミナルで以下を実行："
 echo "   crontab -e"
 echo ""
-echo "💡 cronジョブを削除する場合:"
-echo "   crontab -l | grep -v \"airregi-local-cron.sh\" | crontab -"
+echo "2. 上記のcron設定をコピーして貼り付け"
+echo ""
+echo "3. 保存して終了（vim の場合: :wq）"
+echo ""
+echo "現在のcron設定を確認："
+echo "   crontab -l"
+echo ""
+echo "========================="
+echo ""
+
+# 現在のcron設定を表示
+echo "📋 現在のcron設定:"
+crontab -l 2>/dev/null || echo "（設定なし）"
+EOF < /dev/null

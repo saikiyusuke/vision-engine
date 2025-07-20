@@ -1,0 +1,12 @@
+# ログディレクトリへの直接アクセスを禁止
+<Files "*.log">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ディレクトリ一覧表示を無効化
+Options -Indexes
+
+# PHPエラー表示設定（本番環境では無効化推奨）
+php_flag display_errors off
+php_flag log_errors on

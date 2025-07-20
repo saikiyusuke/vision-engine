@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.0",
+    "axios": "^1.10.0",
+    "basic-ftp": "^5.0.5",
     "dotenv": "^17.2.0",
+    "form-data": "^4.0.4",
     "ftp": "^0.3.10",
     "nodemailer": "^7.0.5",
     "playwright": "^1.40.0"
